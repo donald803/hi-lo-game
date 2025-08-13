@@ -1,0 +1,182 @@
+  <!-- HTML HEADER COMMENT -->
+  <!--
+    File: a02.html
+    Description: Hi-Lo guessing game using JavaScript and HTML
+    Author: Donald Attu
+    Course: PROG1275 - Web Fundamentals
+  -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Hi-Lo Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      text-align: center;
+      padding-top: 50px;
+    }
+    .hidden {
+      display: none;
+    }
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+      margin: 10px;
+    }
+    #message {
+      font-size: 18px;
+      color: #333;
+      margin-top: 20px;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+
+
+  <div id="namePrompt">
+    <label for="playerName">Enter your name:</label><br>
+    <input type="text" id="playerName" />
+    <button onclick="submitName()">Submit</button>
+    <p class="error" id="nameError"></p>
+  </div>
+
+  <div id="maxPrompt" class="hidden">
+    <p id="greeting"></p>
+    <label for="maxNumber">Enter a maximum number (greater than 1):</label><br>
+    <input type="number" id="maxNumber" />
+    <button onclick="submitMax()">Submit</button>
+    <p class="error" id="maxError"></p>
+  </div>
+
+  <div id="gameUI" class="hidden">
+    <p id="rangeMsg"></p>
+    <label for="guessInput" id="guessLabel"></label><br>
+    <input type="number" id="guessInput" />
+    <button onclick="makeGuess()">Make this Guess</button>
+    <p class="error" id="guessError"></p>
+    <p id="message"></p>
+  </div>
+
+  <div id="winUI" class="hidden">
+    <h2>You Win!! You guessed the number!!</h2>
+    <button onclick="playAgain()">Play Again</button>
+  </div>
+
+  <script>
+    // Global Variables
+    let playerName = "";
+    let maxNumber = 0;
+    let targetNumber = 0;
+    let minGuess = 1;
+    let maxGuess = 0;
+    let gameStarted = false;
+
+    // FUNCTION: Submit Player Name
+    function submitName() {
+      const nameInput = document.getElementById("playerName").value.trim();
+      const nameError = document.getElementById("nameError");
+
+      if (nameInput === "") {
+        nameError.textContent = "Name cannot be blank.";
+        return;
+      }
+
+
+      playerName = nameInput;
+      nameError.textContent = "";
+      document.getElementById("namePrompt").classList.add("hidden");
+      document.getElementById("greeting").textContent = `Hi ${playerName}, let's set the range.`;
+      document.getElementById("maxPrompt").classList.remove("hidden");
+    }
+
+
+
+    // FUNCTION- Submit Max Number
+    function submitMax() {
+      const maxInput = parseInt(document.getElementById("maxNumber").value);
+      const maxError = document.getElementById("maxError");
+
+      if (isNaN(maxInput) || maxInput <= 1) {
+        maxError.textContent = "Please enter an integer greater than 1.";
+        return;
+      }
+
+    
+      maxNumber = maxInput;
+      maxGuess = maxNumber;
+      targetNumber = Math.floor(Math.random() * maxNumber) + 1;
+      minGuess = 1;
+
+      maxError.textContent = "";
+      document.getElementById("maxPrompt").classList.add("hidden");
+      document.getElementById("guessLabel").textContent = `${playerName}, guess a number:`;
+      updateRangeMsg();
+      document.getElementById("gameUI").classList.remove("hidden");
+      gameStarted = true;
+    }
+
+    // FUNCTION: Update The Guessing Range Message
+    function updateRangeMsg() {
+      document.getElementById("rangeMsg").textContent =
+        `Your allowable guessing range is any value from ${minGuess} to ${maxGuess}.`;
+    }
+
+    // FUNCTION: Handle The Guess Submission
+    function makeGuess() {
+      const guessInput = document.getElementById("guessInput");
+      const guess = parseInt(guessInput.value);
+      const guessError = document.getElementById("guessError");
+      const message = document.getElementById("message");
+
+      guessError.textContent = "";
+      message.textContent = "";
+
+    if (isNaN(guess)) {
+        guessError.textContent = "Please enter a valid number.";
+        updateRangeMsg();
+        return;
+      }
+      if (guess < minGuess || guess > maxGuess) {
+        guessError.textContent = "Number is outside the allowable range.";
+        updateRangeMsg();
+        return;
+      }
+
+      if (guess === targetNumber) {
+        document.body.style.backgroundColor = "#90ee90"; // Light green
+        document.getElementById("gameUI").classList.add("hidden");
+        document.getElementById("winUI").classList.remove("hidden");
+      } else if (guess < targetNumber) {
+        minGuess = guess + 1;
+        message.textContent = "Too low!";
+        updateRangeMsg();
+      } else {
+        maxGuess = guess - 1;
+        message.textContent = "Too high!";
+        updateRangeMsg();
+      }
+
+      guessInput.value = "";
+    }
+
+    // FUNCTION: Play Again
+    function playAgain() {
+      document.body.style.backgroundColor = "#f2f2f2";
+      document.getElementById("winUI").classList.add("hidden");
+      document.getElementById("maxPrompt").classList.remove("hidden");
+      document.getElementById("maxNumber").value = "";
+      document.getElementById("maxError").textContent = "";
+      document.getElementById("guessInput").value = "";
+      document.getElementById("guessError").textContent = "";
+      document.getElementById("message").textContent = "";
+      gameStarted = false;
+    }
+  </script>
+</body>
+</html>
